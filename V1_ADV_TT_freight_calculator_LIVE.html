@@ -488,7 +488,9 @@
 
   async function getToken() {
     if (_tok && Date.now() < _tokExp) return _tok;
-    const r = await fetch('https://accounts.zoho.in/oauth/v2/token', {
+    // Use corsproxy.io to bypass CORS restriction on Zoho OAuth endpoint
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://accounts.zoho.in/oauth/v2/token');
+    const r = await fetch(proxyUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
@@ -565,10 +567,11 @@
         Trip_Days     : parseFloat(tripDays.toFixed(1)),
       }};
 
-      const url = 'https://creator.zoho.in/api/v2/' +
+      const zohoUrl = 'https://creator.zoho.in/api/v2/' +
                   ZOHO_CONFIG.accountOwner + '/' +
                   ZOHO_CONFIG.appLinkName  + '/form/' +
                   ZOHO_CONFIG.formLinkName;
+      const url = 'https://corsproxy.io/?' + encodeURIComponent(zohoUrl);
 
       const resp = await fetch(url, {
         method : 'POST',
